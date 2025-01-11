@@ -429,6 +429,34 @@ function setTheme(isDark) {
     }
 }
 
+function addNudgeEffect() {
+    const circle = document.querySelector('.breathing-circle');
+    const pulseRing = document.querySelector('.pulse-ring');
+    
+    // Remove animation class if it exists
+    circle.classList.remove('nudge');
+    pulseRing.classList.remove('nudge');
+    
+    // Force a reflow to restart the animation
+    void circle.offsetWidth;
+    void pulseRing.offsetWidth;
+    
+    // Add animation class
+    circle.classList.add('nudge');
+    pulseRing.classList.add('nudge');
+    
+    // Remove class after animation completes
+    setTimeout(() => {
+        circle.classList.remove('nudge');
+        pulseRing.classList.remove('nudge');
+    }, 400);
+}
+
+// Add click listener to all buttons
+document.querySelectorAll('button').forEach(button => {
+    button.addEventListener('click', addNudgeEffect);
+});
+
 // Initialize theme
 document.addEventListener('DOMContentLoaded', () => {
     const savedTheme = localStorage.getItem('theme');
