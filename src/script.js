@@ -457,6 +457,39 @@ document.querySelectorAll('button').forEach(button => {
     button.addEventListener('click', addNudgeEffect);
 });
 
+// Keyboard commands
+document.addEventListener('keydown', (e) => {
+    // Only handle keyboard shortcuts if not in an input field
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    
+    switch (e.key.toLowerCase()) {
+        case ' ': // Spacebar
+            e.preventDefault(); // Prevent page scroll
+            toggleBreathing();
+            break;
+        case 'l': // Toggle light/dark mode
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            setTheme(!isDark);
+            break;
+        case 'a': // Toggle audio
+            toggleAudio();
+            break;
+        case 's': // Toggle patterns
+            const isHidden = patternSelector.hidden;
+            patternSelector.hidden = !isHidden;
+            togglePatternsBtn.style.opacity = isHidden ? '1' : '0.7';
+            break;
+        case 't': // Toggle timer modal
+            timerModal.hidden = !timerModal.hidden;
+            break;
+        case 'escape': // Close modal
+            if (!timerModal.hidden) {
+                timerModal.hidden = true;
+            }
+            break;
+    }
+});
+
 // Initialize theme
 document.addEventListener('DOMContentLoaded', () => {
     const savedTheme = localStorage.getItem('theme');
