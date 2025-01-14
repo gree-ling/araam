@@ -16,12 +16,17 @@ let timerInterval = null;
 let currentState = 'active';
 let breathingInterval = null;
 
+// Get base URL for assets
+const baseURL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+    ? '' 
+    : 'https://araam-ten.vercel.app';
+
 // Audio context and elements
 let audioContext;
 let binaural40Hz;
 let binaural432Hz;
-const inhaleSound = new Audio('./breathe_in.mp3');
-const exhaleSound = new Audio('./breathe_out.mp3');
+const inhaleSound = new Audio(`${baseURL}/breathe_in.mp3`);
+const exhaleSound = new Audio(`${baseURL}/breathe_out.mp3`);
 const chimeSound = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-bell-notification-933.mp3');
 
 // Set audio volumes and load
@@ -136,7 +141,7 @@ function updateBreathing() {
         breathingCircle.style.transitionDuration = `${inhale}s`;
         breathingCircle.classList.add('inhale');
         breathingInstruction.textContent = 'Breathe in...';
-        if (audioEnabled) {
+        if (audioEnabled && inhaleSound.readyState >= 2) {
             inhaleSound.currentTime = 0;
             inhaleSound.play().catch(e => console.error('Inhale audio play failed:', e));
         }
@@ -153,7 +158,7 @@ function updateBreathing() {
             breathingCircle.style.transitionDuration = `${exhale}s`;
             breathingCircle.classList.remove('inhale');
             breathingInstruction.textContent = 'Breathe out...';
-            if (audioEnabled) {
+            if (audioEnabled && exhaleSound.readyState >= 2) {
                 exhaleSound.currentTime = 0;
                 exhaleSound.play().catch(e => console.error('Exhale audio play failed:', e));
             }
@@ -555,12 +560,14 @@ togglePatternsBtn.addEventListener('click', () => {
 
 // Add this function to check if audio is working
 function checkAudioStatus() {
+    console.log('Current base URL:', baseURL);
     [inhaleSound, exhaleSound, chimeSound].forEach(sound => {
+        console.log('Attempting to load audio:', sound.src);
+        
         sound.addEventListener('canplaythrough', () => {
             console.log('Audio loaded successfully:', sound.src);
         });
         
-        // Add load event listener
         sound.addEventListener('loadeddata', () => {
             console.log('Audio data loaded:', sound.src);
         });
