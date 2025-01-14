@@ -20,15 +20,19 @@ let breathingInterval = null;
 let audioContext;
 let binaural40Hz;
 let binaural432Hz;
-const inhaleSound = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-fast-small-sweep-transition-166.mp3');
-const exhaleSound = new Audio('breathe_out.m4a');
+const inhaleSound = new Audio('/public/breathe_in.mp3');
+const exhaleSound = new Audio('/public/breathe_out.mp3');
 const chimeSound = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-bell-notification-933.mp3');
 
-// Set audio volumes
+// Set audio volumes and load
 [inhaleSound, exhaleSound, chimeSound].forEach(sound => {
-    sound.volume = 0.3;
-    // Ensure audio is loaded
+    sound.volume = 1;
+    sound.preload = 'auto';
+    // Load and handle any errors
     sound.load();
+    sound.addEventListener('error', (e) => {
+        console.error('Audio load error:', e);
+    });
 });
 
 // DOM elements
@@ -85,8 +89,8 @@ function createBinauralBeat(leftFreq, rightFreq) {
 
     leftOsc.frequency.value = leftFreq;
     rightOsc.frequency.value = rightFreq;
-    leftGain.gain.value = 0.1; // -20db
-    rightGain.gain.value = 0.1;
+    leftGain.gain.value = 0.02; // -20db
+    rightGain.gain.value = 0.02;
 
     leftOsc.connect(leftGain);
     rightOsc.connect(rightGain);
@@ -134,7 +138,7 @@ function updateBreathing() {
         breathingInstruction.textContent = 'Breathe in...';
         if (audioEnabled) {
             inhaleSound.currentTime = 0;
-            inhaleSound.play().catch(e => console.log('Audio play failed:', e));
+            inhaleSound.play().catch(e => console.error('Inhale audio play failed:', e));
         }
 
         // Hold after inhale
@@ -151,7 +155,7 @@ function updateBreathing() {
             breathingInstruction.textContent = 'Breathe out...';
             if (audioEnabled) {
                 exhaleSound.currentTime = 0;
-                exhaleSound.play().catch(e => console.log('Audio play failed:', e));
+                exhaleSound.play().catch(e => console.error('Exhale audio play failed:', e));
             }
         }, (inhale + hold1) * 1000);
 
@@ -548,3 +552,15 @@ togglePatternsBtn.addEventListener('click', () => {
         patternSelector.style.opacity = '1';
     }
 });
+
+// Add this function to check if audio is working
+function checkAudioStatus() {
+    [inhaleSound, exhaleSound, chimeSound].forEach(sound => {
+        sound.addEventListener('canplaythrough', () => {
+            console.log('Audio loaded successfully:', sound.src);
+        });
+    });
+}
+
+// Call it when the page loads
+document.addEventListener('DOMContentLoaded', checkAudioStatus);
