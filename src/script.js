@@ -20,8 +20,8 @@ let breathingInterval = null;
 let audioContext;
 let binaural40Hz;
 let binaural432Hz;
-const inhaleSound = new Audio('/breathe_in.mp3');
-const exhaleSound = new Audio('/breathe_out.mp3');
+const inhaleSound = new Audio('./breathe_in.mp3');
+const exhaleSound = new Audio('./breathe_out.mp3');
 const chimeSound = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-bell-notification-933.mp3');
 
 // Set audio volumes and load
@@ -558,6 +558,11 @@ function checkAudioStatus() {
     [inhaleSound, exhaleSound, chimeSound].forEach(sound => {
         sound.addEventListener('canplaythrough', () => {
             console.log('Audio loaded successfully:', sound.src);
+        });
+        
+        // Add load event listener
+        sound.addEventListener('loadeddata', () => {
+            console.log('Audio data loaded:', sound.src);
         });
     });
 }
