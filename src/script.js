@@ -4,13 +4,12 @@ const ENGAGEMENT_STATE_DURATION = 15000;
 
 // Breathing patterns in seconds: [inhale, hold1, exhale, hold2]
 const breathingPatterns = {
-    '4-4-4-4': [4, 4, 4, 4],
-    '4-7-8': [4, 7, 8, 0],
-    '5-5': [5, 0, 5, 0]
+    '6-6-6-6': [6, 6, 6, 6],
+    '4-7-8': [4, 7, 8, 4],
 };
 
 // State management
-let currentPattern = '4-4-4-4';
+let currentPattern = '6-6-6-6';
 let isBreathingActive = false;
 let audioEnabled = true;
 let timerInterval = null;
@@ -22,12 +21,14 @@ let audioContext;
 let binaural40Hz;
 let binaural432Hz;
 const inhaleSound = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-fast-small-sweep-transition-166.mp3');
-const exhaleSound = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-fast-small-sweep-transition-166.mp3');
+const exhaleSound = new Audio('breathe_out.m4a');
 const chimeSound = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-bell-notification-933.mp3');
 
 // Set audio volumes
 [inhaleSound, exhaleSound, chimeSound].forEach(sound => {
-    sound.volume = 0.2; // -20db approximation
+    sound.volume = 0.3;
+    // Ensure audio is loaded
+    sound.load();
 });
 
 // DOM elements
@@ -127,13 +128,14 @@ function updateBreathing() {
     function breathingCycle() {
         if (!isBreathingActive) return;
 
-        // Set transition duration for inhale
-        breathingCircle.style.transitionDuration = `${inhale}s`;
-
         // Inhale
+        breathingCircle.style.transitionDuration = `${inhale}s`;
         breathingCircle.classList.add('inhale');
         breathingInstruction.textContent = 'Breathe in...';
-        if (audioEnabled) inhaleSound.play();
+        if (audioEnabled) {
+            inhaleSound.currentTime = 0;
+            inhaleSound.play().catch(e => console.log('Audio play failed:', e));
+        }
 
         // Hold after inhale
         setTimeout(() => {
@@ -141,13 +143,16 @@ function updateBreathing() {
             breathingInstruction.textContent = 'Hold...';
         }, inhale * 1000);
 
-        // Set transition duration for exhale
+        // Exhale
         setTimeout(() => {
             if (!isBreathingActive) return;
             breathingCircle.style.transitionDuration = `${exhale}s`;
             breathingCircle.classList.remove('inhale');
             breathingInstruction.textContent = 'Breathe out...';
-            if (audioEnabled) exhaleSound.play();
+            if (audioEnabled) {
+                exhaleSound.currentTime = 0;
+                exhaleSound.play().catch(e => console.log('Audio play failed:', e));
+            }
         }, (inhale + hold1) * 1000);
 
         // Hold after exhale

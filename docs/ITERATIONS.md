@@ -50,3 +50,36 @@
 - add a title to the page
 - populate the metadata
 - review the spacing
+
+---
+
+## Iteration 4
+
+Jan 13, 2025
+
+### what went well
+- update the UX to be cleaner
+- simplifeid the buttons
+- added keyboard controls to each button
+- updated color scheme including dark mode
+
+### where to improve
+- feedback - increase length of breathe in and breathe out on default
+- make circle bigger, especially on mobile
+- add breathe in and breathe out audio cues (Breathe_out.mfa is in /public)
+
+
+## Iteration 5
+
+Jan 14, 2025
+
+### what went well
+- the breathing circle is nice and calming
+- the audio is good
+- the changing quotes are inspiration and nice
+- the breathing instructions are helpful
+
+### where to improve
+- Breathing cirlce should be z index below the buttons and text
+- the breathign cirlce should reduce to a smaller size
+- the breathe out audio isn't playiking on breathing out
