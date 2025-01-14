@@ -25,18 +25,23 @@ const baseURL = window.location.hostname === 'localhost' || window.location.host
 let audioContext;
 let binaural40Hz;
 let binaural432Hz;
-const inhaleSound = new Audio(`${baseURL}/breathe_in.mp3`);
-const exhaleSound = new Audio(`${baseURL}/breathe_out.mp3`);
+
+// Use paths relative to the build output
+const inhaleSound = new Audio('./breathe_in.mp3');
+const exhaleSound = new Audio('./breathe_out.mp3');
 const chimeSound = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-bell-notification-933.mp3');
 
 // Set audio volumes and load
 [inhaleSound, exhaleSound, chimeSound].forEach(sound => {
     sound.volume = 1;
     sound.preload = 'auto';
+    
     // Load and handle any errors
     sound.load();
+    
+    // Add error handling
     sound.addEventListener('error', (e) => {
-        console.error('Audio load error for:', sound.src, e);
+        console.error('Audio load error for:', sound.src, e.target.error);
     });
 });
 
@@ -143,7 +148,12 @@ function updateBreathing() {
         breathingInstruction.textContent = 'Breathe in...';
         if (audioEnabled && inhaleSound.readyState >= 2) {
             inhaleSound.currentTime = 0;
-            inhaleSound.play().catch(e => console.error('Inhale audio play failed:', e));
+            inhaleSound.play()
+                .catch(e => {
+                    console.error('Inhale audio play failed:', e);
+                    // Try reloading the audio
+                    inhaleSound.load();
+                });
         }
 
         // Hold after inhale
@@ -160,7 +170,12 @@ function updateBreathing() {
             breathingInstruction.textContent = 'Breathe out...';
             if (audioEnabled && exhaleSound.readyState >= 2) {
                 exhaleSound.currentTime = 0;
-                exhaleSound.play().catch(e => console.error('Exhale audio play failed:', e));
+                exhaleSound.play()
+                    .catch(e => {
+                        console.error('Exhale audio play failed:', e);
+                        // Try reloading the audio
+                        exhaleSound.load();
+                    });
             }
         }, (inhale + hold1) * 1000);
 
@@ -560,7 +575,6 @@ togglePatternsBtn.addEventListener('click', () => {
 
 // Add this function to check if audio is working
 function checkAudioStatus() {
-    console.log('Current base URL:', baseURL);
     [inhaleSound, exhaleSound, chimeSound].forEach(sound => {
         console.log('Attempting to load audio:', sound.src);
         
@@ -575,4 +589,23 @@ function checkAudioStatus() {
 }
 
 // Call it when the page loads
-document.addEventListener('DOMContentLoaded', checkAudioStatus);
+document.addEventListener('DOMContentLoaded', () => {
+    checkAudioStatus();
+    
+    // Try to preload audio files
+    Promise.all([
+        fetch('../public/breathe_in.mp3'),
+        fetch('../public/breathe_out.mp3')
+    ])
+    .then(responses => {
+        console.log('Audio files fetched successfully');
+        responses.forEach(response => {
+            if (!response.ok) {
+                console.error('Audio fetch failed:', response.status, response.statusText);
+            }
+        });
+    })
+    .catch(error => {
+        console.error('Failed to fetch audio files:', error);
+    });
+});

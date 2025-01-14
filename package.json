@@ -1,0 +1,12 @@
+{
+  "name": "araam",
+  "version": "1.0.0",
+  "description": "A calming breathing app",
+  "scripts": {
+    "build": "mkdir -p dist && cp -r src/* dist/ && cp -r public/* dist/",
+    "start": "serve dist"
+  },
+  "dependencies": {
+    "serve": "^14.0.0"
+  }
+} 
